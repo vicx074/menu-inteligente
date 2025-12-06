@@ -1,5 +1,8 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Garante altura total */
 html, body, #root {
   height: 100%;
   margin: 0;

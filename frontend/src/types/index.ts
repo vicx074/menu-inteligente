@@ -1,4 +1,3 @@
-// Define o formato do Produto (espelho do Supabase)
 export interface Product {
   id: number;
   name: string;
@@ -8,13 +7,11 @@ export interface Product {
   pairing_suggestion?: string;
 }
 
-// Define o formato da Mensagem
 export interface Message {
   sender: 'user' | 'bot';
   text: string;
 }
 
-// Define a resposta da API do Chat
 export interface ApiChatResponse {
   response: string;
 }
