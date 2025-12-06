@@ -50,7 +50,13 @@ function App() {
           {messages.map((msg, idx) => (
             <MessageBubble key={idx} message={msg} />
           ))}
-          {isLoading && <div className="text-xs text-gray-400 italic ml-12 animate-pulse">Digitando...</div>}
+          {isLoading && (
+            <div className="flex items-center gap-1 ml-14 py-2 h-8">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+            </div>
+          )}
           <div ref={scrollRef} />
         </div>
 
