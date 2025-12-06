@@ -6,7 +6,7 @@ class AISalesService:
     def __init__(self):
         genai.configure(api_key=Config.GEMINI_KEY)
         # Modelo atualizado conforme sua preferência
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash-lite')
         self.repository = ProductRepository()
 
     def _build_context(self):
