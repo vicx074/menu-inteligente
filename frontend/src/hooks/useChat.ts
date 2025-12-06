@@ -6,23 +6,37 @@ export function useChat() {
   const [products, setProducts] = useState<Product[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOrderCompleted, setIsOrderCompleted] = useState(false); // Novo Estado
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Função para Reiniciar o Chat
+  const resetChat = async () => {
+    setIsOrderCompleted(false);
+    setMessages([]); // Limpa a tela
+    setIsLoading(true);
+    try {
+      // Chama o Hello de novo
+      const { response } = await MenuService.sendMessage("START_CHAT_SIGNAL", []);
+      setMessages([{ sender: 'bot', text: response }]);
+    } catch (e) {
+        // erro silencioso ou msg padrão
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const init = async () => {
       setIsLoading(true);
       try {
-        const [menu, greeting] = await Promise.all([
+        const [menu, initialRes] = await Promise.all([
           MenuService.getProducts(),
           MenuService.sendMessage("START_CHAT_SIGNAL")
         ]);
         setProducts(menu);
-        setMessages([{ sender: 'bot', text: greeting }]);
-      } catch (e) {
-        setMessages([{ sender: 'bot', text: "Erro ao conectar ao servidor." }]);
-      } finally {
-        setIsLoading(false);
-      }
+        setMessages([{ sender: 'bot', text: initialRes.response }]);
+      } catch (e) { /* ... */ } 
+      finally { setIsLoading(false); }
     };
     init();
   }, []);
@@ -33,13 +47,21 @@ export function useChat() {
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
-    
-    setMessages(prev => [...prev, { sender: 'user', text }]);
+
+    const newUserMsg: Message = { sender: 'user', text };
+    setMessages(prev => [...prev, newUserMsg]);
     setIsLoading(true);
 
     try {
-      const response = await MenuService.sendMessage(text);
+      // Pega a resposta e a flag de completado
+      const { response, is_completed } = await MenuService.sendMessage(text, messages);
+      
       setMessages(prev => [...prev, { sender: 'bot', text: response }]);
+      
+      if (is_completed) {
+        setIsOrderCompleted(true); // Trava o chat!
+      }
+
     } catch (e) {
       setMessages(prev => [...prev, { sender: 'bot', text: "Erro técnico." }]);
     } finally {
@@ -47,5 +69,6 @@ export function useChat() {
     }
   };
 
-  return { products, messages, isLoading, sendMessage, scrollRef };
+  // Retorna tudo isso pro App
+  return { products, messages, isLoading, isOrderCompleted, sendMessage, resetChat, scrollRef };
 }

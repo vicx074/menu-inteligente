@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Product, ApiChatResponse } from '../types';
+import type { Product, ApiChatResponse, Message } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -19,10 +19,10 @@ export const MenuService = {
     }
   },
 
-  sendMessage: async (message: string): Promise<string> => {
+ sendMessage: async (message: string, history: Message[] = []) => {
     try {
-      const { data } = await api.post<ApiChatResponse>('/chat', { message });
-      return data.response;
+      const { data } = await api.post<ApiChatResponse>('/chat', { message, history });
+      return data; 
     } catch (error) {
       throw new Error("Erro de comunicação");
     }

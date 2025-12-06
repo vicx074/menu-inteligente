@@ -11,7 +11,7 @@ export interface Message {
   sender: 'user' | 'bot';
   text: string;
 }
-
 export interface ApiChatResponse {
   response: string;
+  is_completed: boolean;
 }
