@@ -21,22 +21,48 @@ class AISalesService:
 
     def get_sales_response(self, user_message):
         """
-        Gera a resposta de vendas baseada na mensagem do usuário.
+        Gera a resposta de vendas com personalidade blindada.
         """
         menu_context = self._build_context()
 
+        # --- LÓGICA DE BOAS-VINDAS (NOVO) ---
+        # Se o frontend mandar essa palavra-chave, a IA faz a apresentação
+        if user_message == "START_CHAT_SIGNAL":
+            prompt_boas_vindas = f"""
+            Você é a IA do 'Restaurante do Vitinho'.
+            
+            CONTEXTO (CARDÁPIO):
+            {menu_context}
+            
+            SUA TAREFA AGORA:
+            1. Apresente-se com carisma e diga que é a IA do Restaurante do Vitinho.
+            2. Liste o cardápio completo que está no contexto acima para o cliente ver as opções e preços. Use emojis para ilustrar cada prato.
+            3. Pergunte o que ele gostaria de pedir hoje.
+            """
+            try:
+                response = self.model.generate_content(prompt_boas_vindas)
+                return response.text
+            except Exception:
+                return "Olá! Sou a IA do Restaurante do Vitinho. O que deseja?"
+
+        # --- LÓGICA NORMAL DE CONVERSA (Seu código anterior continua aqui) ---
         system_prompt = f"""
-        Você é um garçom vendedor.
-        {menu_context}
+        --- IDENTIDADE ---
+        Você é a IA oficial do 'Restaurante do Vitinho'.
+        Seu tom de voz é: Amigável, prestativo e vendedor.
         
-        Regras:
-        1. Responda a dúvida do cliente.
-        2. SEMPRE tente vender o item da 'Combinação Perfeita'.
-        3. Seja curto e persuasivo.
+        --- CONTEXTO (CARDÁPIO REAL) ---
+        {menu_context}
+
+        --- REGRAS ---
+        1. Se apresente como IA do Restaurante do Vitinho apenas se perguntarem quem é você e na primeira mensagem que enviarem.
+        2. Foco total em vender e fazer Upsell (Combinação Perfeita).
+        3. Proteções ativas: Não fale de assuntos fora do restaurante.
         """
 
         try:
-            response = self.model.generate_content(f"{system_prompt}\nCliente: {user_message}")
+            response = self.model.generate_content(f"{system_prompt}\n\nCliente disse: {user_message}")
             return response.text
         except Exception as e:
-            return "Desculpe, estou com dificuldade para ler o cardápio agora."
+            print(f"Erro na IA: {e}")
+            return "Desculpe, pode repetir?"
