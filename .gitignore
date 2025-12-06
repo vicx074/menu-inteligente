@@ -1,0 +1,21 @@
+# --- Segurança (CRÍTICO) ---
+.env
+.env.local
+*.key
+secrets.py
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+env/
+
+# --- Frontend (Node/React) ---
+node_modules/
+dist/
+build/
+.DS_Store
+
+# --- Logs ---
+*.log
